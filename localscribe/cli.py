@@ -10,7 +10,6 @@ from .config import OUTPUT_ROOT
 from .log import setup_logging
 from .stages import align, diarize, download, identify, report, summarize, transcribe
 
-
 STAGE_NAMES = ["download", "transcribe", "diarize", "align",
                "identify", "summarize", "report"]
 

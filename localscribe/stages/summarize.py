@@ -28,7 +28,7 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-from ..config import Paths, cached, load_json
+from ..config import Paths, load_json
 from ..llm import ask
 from ..text import to_ascii, write_ascii
 

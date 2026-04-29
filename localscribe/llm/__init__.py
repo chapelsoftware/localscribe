@@ -17,7 +17,6 @@ from __future__ import annotations
 
 from ..config import get_env
 
-
 KNOWN_BACKENDS = ("claude_cli", "codex_cli", "gemini_cli", "openai_api")
 
 

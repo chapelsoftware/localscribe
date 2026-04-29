@@ -22,7 +22,6 @@ import httpx
 from ..config import get_env
 from . import LLMError
 
-
 DEFAULT_BASE_URL = "https://api.openai.com/v1"
 DEFAULT_MODEL = "gpt-4o"
 

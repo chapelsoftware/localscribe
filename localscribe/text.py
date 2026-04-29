@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import unicodedata
 
-
 # Targeted transliterations for characters Claude loves that have good
 # multi-character ASCII equivalents. Applied before the NFKD fallback.
 _TRANSLIT = {

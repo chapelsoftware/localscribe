@@ -6,7 +6,7 @@ import pytest
 
 import localscribe.llm as llm
 from localscribe.llm import claude_cli as _claude_cli  # noqa: F401
-from localscribe.llm import codex_cli as _codex_cli    # noqa: F401
+from localscribe.llm import codex_cli as _codex_cli  # noqa: F401
 from localscribe.llm import gemini_cli as _gemini_cli  # noqa: F401
 from localscribe.llm import openai_api as _openai_api  # noqa: F401
 from localscribe.stages.align import _speaker_for_time

@@ -28,7 +28,7 @@ dependencies = [
 whisper-cpp = ["pywhispercpp>=1.2"]
 
 # Tools for running tests / contributing. Not pulled in by default.
-dev = ["pytest>=8.0"]
+dev = ["pytest>=8.0", "ruff>=0.7"]
 
 [project.scripts]
 localscribe = "localscribe.cli:main"
@@ -39,3 +39,16 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["localscribe*"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+# Default rules (pyflakes + a safe pycodestyle subset). Keep it minimal --
+# this codebase has hand-tuned formatting (esp. the prompt templates in
+# stages/summarize.py) that we don't want a formatter rewriting.
+extend-select = ["I"]  # import sorting
+
+[tool.ruff.lint.isort]
+known-first-party = ["localscribe"]
