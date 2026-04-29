@@ -1,0 +1,41 @@
+[project]
+name = "localscribe"
+version = "0.1.0"
+description = "Local YouTube video summarizer with speaker diarization"
+authors = [{name = "Chapel Software"}]
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+dependencies = [
+    "yt-dlp>=2024.10.0",
+    "faster-whisper>=1.0.3",
+    "pyannote.audio>=3.3.0",
+    # pyannote.audio 3.4.0 still calls hf_hub_download(use_auth_token=...)
+    # which was removed in huggingface_hub 1.0. Pin to the 0.x line.
+    "huggingface_hub<1.0",
+    "torch>=2.2.0",
+    "torchaudio>=2.2.0",
+    "numpy<2",
+    "click>=8.1.0",
+    "markdown>=3.6",
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+# Adds whisper.cpp as an alternate transcription engine. Picks up Metal
+# automatically on Apple Silicon, giving a large speedup over CPU
+# faster-whisper. setup.sh installs this extra on macOS arm64.
+whisper-cpp = ["pywhispercpp>=1.2"]
+
+# Tools for running tests / contributing. Not pulled in by default.
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+localscribe = "localscribe.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["localscribe*"]
