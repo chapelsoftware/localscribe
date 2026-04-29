@@ -23,7 +23,7 @@ Native Windows is not supported (use WSL2).
 
 Options:
   --cpu             Force CPU-only torch wheels.
-  --cuda=VER        Force a CUDA wheel index. VER is one of: cu121, cu124, cu128.
+  --cuda=VER        Force a CUDA wheel index. VER is one of: cu126, cu128, cu130.
   --mps             Force Apple Silicon install (stock PyPI torch + Metal whisper.cpp).
   --vulkan          Force Linux+Vulkan install (CPU torch + whisper.cpp built with Vulkan).
   --llm=BACKEND     LLM backend: claude_cli (default), codex_cli, gemini_cli,
@@ -42,8 +42,8 @@ for arg in "$@"; do
         --cpu)        BACKEND_OVERRIDE="cpu" ;;
         --mps)        BACKEND_OVERRIDE="mps" ;;
         --vulkan)     BACKEND_OVERRIDE="vulkan" ;;
-        --cuda=cu121|--cuda=cu124|--cuda=cu128) BACKEND_OVERRIDE="${arg#--cuda=}" ;;
-        --cuda=*)     err "invalid --cuda value (expected cu121, cu124, or cu128)"; exit 2 ;;
+        --cuda=cu126|--cuda=cu128|--cuda=cu130) BACKEND_OVERRIDE="${arg#--cuda=}" ;;
+        --cuda=*)     err "invalid --cuda value (expected cu126, cu128, or cu130)"; exit 2 ;;
         --llm=claude_cli|--llm=codex_cli|--llm=gemini_cli|--llm=openai_api)
             LLM_OVERRIDE="${arg#--llm=}" ;;
         --llm=*)
@@ -136,10 +136,10 @@ detect_backend() {
         case "$major" in
             ''|*[!0-9]*) ;;
             *)
+                if [ "$major" -ge 580 ]; then echo "cu130"; return; fi
                 if [ "$major" -ge 570 ]; then echo "cu128"; return; fi
-                if [ "$major" -ge 550 ]; then echo "cu124"; return; fi
-                if [ "$major" -ge 525 ]; then echo "cu121"; return; fi
-                warn "NVIDIA driver $drv is older than 525.x; CUDA wheels need a newer driver. Falling back to CPU."
+                if [ "$major" -ge 560 ]; then echo "cu126"; return; fi
+                warn "NVIDIA driver $drv is older than 560.x; pyannote.audio 4 needs torch 2.11 which only ships at cu126+ wheels. Falling back to CPU."
                 ;;
         esac
     fi
@@ -323,7 +323,7 @@ pip install --upgrade pip wheel setuptools
 
 # ---- Install torch with the selected backend ----
 case "$BACKEND" in
-    cu121|cu124|cu128)
+    cu126|cu128|cu130)
         info "Installing torch from PyTorch's $BACKEND wheel index"
         pip install --index-url "https://download.pytorch.org/whl/$BACKEND" torch torchaudio
         ;;
@@ -403,20 +403,19 @@ echo
 ok "Setup complete."
 echo
 echo "Next steps:"
-echo "  1. Accept terms at https://hf.co/pyannote/speaker-diarization-3.1"
-echo "  2. Accept terms at https://hf.co/pyannote/segmentation-3.0"
+echo "  1. Accept terms at https://hf.co/pyannote/speaker-diarization-community-1"
 if [ "$ENV_CREATED" -eq 1 ]; then
-    echo "  3. Edit .env (just created) and set HF_TOKEN=hf_..."
+    echo "  2. Edit .env (just created) and set HF_TOKEN=hf_..."
 else
-    echo "  3. Set HF_TOKEN in .env (or export HF_TOKEN=hf_...)"
+    echo "  2. Set HF_TOKEN in .env (or export HF_TOKEN=hf_...)"
 fi
 if [ "$LLM_BACKEND" = "openai_api" ] && [ -z "$OPENAI_API_KEY_VAL" ]; then
-    echo "  4. Set OPENAI_API_KEY in .env (or leave blank for local Ollama / LM Studio)"
-    echo "  5. source .venv/bin/activate"
-    echo "  6. localscribe <youtube-url>"
-else
+    echo "  3. Set OPENAI_API_KEY in .env (or leave blank for local Ollama / LM Studio)"
     echo "  4. source .venv/bin/activate"
     echo "  5. localscribe <youtube-url>"
+else
+    echo "  3. source .venv/bin/activate"
+    echo "  4. localscribe <youtube-url>"
 fi
 
 case "$BACKEND" in

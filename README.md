@@ -10,7 +10,7 @@ video and audio never leave your machine.
 
 1. **Download** — `yt-dlp` pulls audio + metadata
 2. **Transcribe** — `faster-whisper` (large-v3) or `whisper.cpp` (Metal/Vulkan), with word timestamps
-3. **Diarize** — `pyannote.audio` 3.1, assigns speaker turns
+3. **Diarize** — `pyannote.audio` (community-1 model), assigns speaker turns
 4. **Align** — merge transcript words with speaker turns
 5. **Identify speakers** — `claude -p` scans the transcript for self-intros
 6. **Summarize** — chunked summarization via `claude -p`, then final synthesis
@@ -57,8 +57,8 @@ your hardware. Override with `--cpu`, `--cuda=cuXYZ`, `--mps`, or `--vulkan`.
 
 | OS / hardware | Transcription | Diarization | Status |
 |---|---|---|---|
-| Linux + NVIDIA (driver ≥ 570) | faster-whisper (CUDA) | pyannote (CUDA) | **Tested** (cu128 path) |
-| Linux + NVIDIA (driver 525–569) | faster-whisper (CUDA) | pyannote (CUDA) | Untested (cu121/cu124 wheel paths) |
+| Linux + NVIDIA (driver ≥ 580) | faster-whisper (CUDA) | pyannote (CUDA) | **Tested** (cu130 path) |
+| Linux + NVIDIA (driver 560–579) | faster-whisper (CUDA) | pyannote (CUDA) | Untested (cu126/cu128 wheel paths) |
 | Linux + no GPU | faster-whisper (CPU) | pyannote (CPU) | Untested end-to-end |
 | Linux + AMD/Intel + Vulkan | whisper.cpp (Vulkan) | pyannote (CPU) | **Untested** — pywhispercpp source build with `-DGGML_VULKAN=on` |
 | macOS Apple Silicon | whisper.cpp (Metal) | pyannote (MPS) | **Untested** — pywhispercpp Metal wheel + pyannote MPS fallback |
@@ -155,8 +155,8 @@ env var.
 ./setup.sh --cpu              # force CPU-only install
 ./setup.sh --vulkan           # force Linux+Vulkan (whisper.cpp from source)
 ./setup.sh --llm=openai_api   # skip the LLM prompt; pick openai_api non-interactively
-# You'll need a HuggingFace token with access to pyannote/speaker-diarization-3.1
-# (accept the gated model terms at https://hf.co/pyannote/speaker-diarization-3.1)
+# You'll need a HuggingFace token with access to pyannote/speaker-diarization-community-1
+# (accept the gated model terms at https://hf.co/pyannote/speaker-diarization-community-1)
 export HF_TOKEN=hf_xxx
 ```
 
@@ -200,8 +200,7 @@ Each stage caches its output, so re-running is cheap.
 
 **`No HuggingFace token found`** — pyannote's diarization model is
 gated. Accept the terms at
-<https://hf.co/pyannote/speaker-diarization-3.1> and
-<https://hf.co/pyannote/segmentation-3.0>, then either run
+<https://hf.co/pyannote/speaker-diarization-community-1>, then either run
 `huggingface-cli login` or set `HF_TOKEN=hf_...` in `.env`.
 
 **`claude CLI not found on PATH`** — only relevant when

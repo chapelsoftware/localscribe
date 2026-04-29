@@ -166,6 +166,6 @@ def hf_token() -> str:
         raise RuntimeError(
             "No HuggingFace token found. Either run `huggingface-cli login` "
             "or export HF_TOKEN=hf_xxx. You also need to accept the gated "
-            "model terms at https://hf.co/pyannote/speaker-diarization-3.1"
+            "model terms at https://hf.co/pyannote/speaker-diarization-community-1"
         )
     return token
