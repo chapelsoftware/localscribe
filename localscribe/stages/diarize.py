@@ -1,4 +1,4 @@
-"""Stage 3: Speaker diarization with pyannote.audio 3.1."""
+"""Stage 3: Speaker diarization with pyannote.audio (model: pyannote/speaker-diarization-community-1)."""
 from __future__ import annotations
 
 import logging
@@ -31,10 +31,10 @@ def run(paths: Paths, force: bool = False) -> list[dict]:
     torch.load = _trusting_load
     try:
         from pyannote.audio import Pipeline
-        log.info("loading pyannote/speaker-diarization-3.1...")
+        log.info("loading pyannote/speaker-diarization-community-1...")
         pipeline = Pipeline.from_pretrained(
-            "pyannote/speaker-diarization-3.1",
-            use_auth_token=hf_token(),
+            "pyannote/speaker-diarization-community-1",
+            token=hf_token(),
         )
     finally:
         torch.load = _orig_torch_load
@@ -47,10 +47,15 @@ def run(paths: Paths, force: bool = False) -> list[dict]:
     pipeline.to(device)
 
     log.info("running on %s (device=%s)...", paths.audio, device.type)
-    diarization = pipeline(str(paths.audio))
+    # pyannote 4's community-1 pipeline returns a DiarizeOutput wrapper that
+    # bundles regular and "exclusive" speaker diarization. We use the regular
+    # one; the exclusive variant is for tighter alignment with transcript
+    # timestamps and isn't needed since we run our own alignment in stage 4.
+    output = pipeline(str(paths.audio))
+    annotation = output.speaker_diarization
 
     turns = []
-    for turn, _track, speaker in diarization.itertracks(yield_label=True):
+    for turn, _track, speaker in annotation.itertracks(yield_label=True):
         turns.append({
             "start": float(turn.start),
             "end": float(turn.end),
