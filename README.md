@@ -196,6 +196,85 @@ localscribe --clean <url-or-id>
 
 Each stage caches its output, so re-running is cheap.
 
+## Clips workflow
+
+After the main pipeline produces a transcript, `localscribe-clips`
+turns selected portions into vertical 9:16 short-form videos
+(YouTube Shorts / TikTok / Reels). It reads the existing
+word-level transcript, builds caption phrases timed to the audio,
+and renders each clip with optional speaker auto-zoom.
+
+```bash
+source .venv/bin/activate
+
+# 1. Pull the full video stream (the main pipeline only saves audio).
+localscribe-clips fetch <url-or-id>
+
+# 2a. Cut a single clip by timestamp.
+localscribe-clips cut <id> \
+    --start 12:53 --end 13:44 \
+    --title "The point I want to make" \
+    --auto-zoom
+
+# 2b. Or cut by what was said. Phrase mode searches the word-level
+#     transcript and resolves to the matching word boundaries.
+localscribe-clips cut <id> \
+    --start-phrase "the thing I keep coming back to is" \
+    --end-phrase   "and that is why this matters" \
+    --title "The point I want to make" \
+    --auto-zoom
+
+# 3. Cut many clips for one video from a JSON config.
+localscribe-clips cut-batch <id> clips.json --replace --auto-zoom
+```
+
+`clips.json` is a list of clip definitions; each can use timestamps
+or transcript phrases:
+
+```json
+{
+  "clips": [
+    {
+      "id": "headline-quote",
+      "title": "The headline quote",
+      "start_phrase": "the thing I keep coming back to is",
+      "end_phrase":   "and that is why this matters"
+    },
+    {
+      "id": "second-clip",
+      "title": "Another moment",
+      "start": 1757.1,
+      "end":   1781.8,
+      "style": "crop"
+    }
+  ]
+}
+```
+
+`--replace` backs `clips.json` up to `clips.<utc>.bak.json` next to
+it, then wipes existing entries and their rendered files in
+`shorts/` before defining the new ones. Drop `--replace` to upsert
+into the existing manifest.
+
+```bash
+# 4. Review and edit captions in a local web UI.
+localscribe-clips review
+
+# 5. Re-render captions onto already-cut clips after editing.
+localscribe-clips render <id>
+```
+
+By default, `cut` runs a snap-silence pass that tightens clip
+boundaries to where speech actually starts and ends (the captioned
+content drives the snap; audio RMS is the fallback). Pass
+`--no-snap-silence` to keep the literal boundaries you provided.
+
+The review UI (`localscribe-clips review`) reads every video's
+`clips.json` under `output/` and lets you scrub, trim, edit
+captions, archive, and re-render in the browser. Captioned
+finals land in a universal `output/_completed/` directory so
+they're easy to grab.
+
 ## Troubleshooting
 
 **`No HuggingFace token found`** — pyannote's diarization model is

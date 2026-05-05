@@ -87,6 +87,9 @@ secrets.json
 # ---- Local-only tooling (kept out of the repo) ----
 .claude/
 
+# PM2 process config — paths and ports are host-specific.
+ecosystem.config.js
+
 # ---- Editors / IDEs ----
 .idea/
 .vscode/
