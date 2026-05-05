@@ -16,6 +16,9 @@ dependencies = [
     "click>=8.1.0",
     "markdown>=3.6",
     "httpx>=0.27",
+    # opencv-python-headless is small and only used by clips/detect.py.
+    # Bundled cascades are good enough for speaker auto-zoom.
+    "opencv-python-headless>=4.8",
 ]
 
 [project.optional-dependencies]
@@ -29,6 +32,7 @@ dev = ["pytest>=8.0", "ruff>=0.7"]
 
 [project.scripts]
 localscribe = "localscribe.cli:main"
+localscribe-clips = "localscribe.clips.cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]
